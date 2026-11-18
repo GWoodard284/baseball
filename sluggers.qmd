@@ -1,0 +1,66 @@
+---
+title: "Sluggers"
+---
+
+```{r}
+#| message: false
+library(tidyverse)
+library(Lahman)
+```
+
+```{r}
+career_batting <- Batting |>
+  group_by(playerID) |>
+  summarize(
+    career_home_runs = sum(HR, na.rm = TRUE),
+    first_year = min(yearID, na.rm = TRUE),
+    last_year = max(yearID, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  arrange(desc(career_home_runs)) |>
+  slice_head(n = 15) |>
+  left_join(People, by = "playerID") |>
+  mutate(
+    player = paste(nameFirst, nameLast),
+    seasons = paste(first_year, last_year, sep = "–"),
+    steroid_era = if_else(
+      last_year >= 1994 & first_year <= 2009,
+      "Active during steroid era",
+      "Not active during steroid era"
+    )
+  ) |>
+  select(player, career_home_runs, seasons, steroid_era)
+
+career_batting |>
+  mutate(player = fct_reorder(player, career_home_runs)) |>
+  ggplot(aes(x = career_home_runs, y = player, fill = steroid_era)) +
+  geom_col() +
+  scale_fill_manual(
+    values = c(
+      "Active during steroid era" = "#D55E00",
+      "Not active during steroid era" = "gray55"
+    )
+  ) +
+  labs(
+    title = "Career Home Run Leaders",
+    subtitle = "Top 15 MLB players by career home runs",
+    x = "Career home runs",
+    y = NULL,
+    fill = "Career overlap",
+    caption = "Source: Lahman Baseball Database"
+  )
+```
+
+```{r}
+Batting |>
+  filter(playerID == "bondsba01") |>
+  group_by(yearID) |>
+  summarize(home_runs = sum(HR, na.rm = TRUE), .groups = "drop") |>
+  ggplot(aes(x = yearID, y = home_runs)) +
+  geom_col(fill = "#D55E00") +
+  labs(
+    title = "Barry Bonds' Home Runs by Season",
+    x = "Season",
+    y = "Home runs"
+  )
+```
