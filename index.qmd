@@ -1,7 +1,5 @@
 ---
-title: "Baseball"
+title: "The History of Major League Baseball"
 ---
 
-This is a Quarto website.
-
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+This site explores the history of Major League Baseball through data. We use the Lahman database to uncover patterns and stories across the people, teams, and seasons of the game.
